@@ -1,8 +1,5 @@
 package androidx.build
 
-import androidx.build.KotlinVersion.KOTLIN_1_8
-import androidx.build.KotlinVersion.KOTLIN_1_9
-import androidx.build.KotlinVersion.KOTLIN_2_0
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project

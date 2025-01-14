@@ -7,6 +7,12 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0")
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of("21"))
+    }
+}
+
 gradlePlugin {
     plugins {
         create("jvm-ecosystem-plugin") {
