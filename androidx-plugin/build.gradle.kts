@@ -5,6 +5,7 @@ plugins {
 dependencies {
     implementation(gradleApi())
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0")
+    implementation("com.android.tools.build:gradle:8.9.0-alpha09")
 }
 
 java {
@@ -18,6 +19,10 @@ gradlePlugin {
         create("jvm-ecosystem-plugin") {
             id = "androidx-jvm-ecosystem-plugin"
             implementationClass = "androidx.build.JvmEcosystemPlugin"
+        }
+        create("android-ecosystem-plugin") {
+            id = "androidx-android-ecosystem-plugin"
+            implementationClass = "androidx.build.AndroidEcosystemPlugin"
         }
     }
 }

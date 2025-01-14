@@ -1,5 +1,7 @@
 pluginManagement {
     repositories {
+        mavenCentral()
+        google()
         gradlePluginPortal()
     }
     includeBuild("androidx-plugin")
@@ -8,15 +10,17 @@ pluginManagement {
 plugins {
     id("org.gradle.experimental.jvm-ecosystem").version("0.1.30")
     id("androidx-jvm-ecosystem-plugin")
+    id("androidx-android-ecosystem-plugin")
 }
 
-rootProject.name = "example-java-app"
+rootProject.name = "declarative-androidx"
 
 include("app")
 include("list")
 include("utilities")
 include("lib")
 include("kotlinLib")
+include("androidLib")
 
 defaults {
     javaLibrary {
