@@ -1,0 +1,2 @@
+[libraries]
+agpTestingPlatformCoreProto =  { module = "com.google.testing.platform:core-proto", version = "0.0.8-alpha08" }

@@ -46,7 +46,10 @@ abstract class JvmLibrary : Plugin<Project> {
         private val failOnDeprecationWarnings: Provider<Boolean>
     ): CommandLineArgumentProvider {
         override fun asArguments(): MutableIterable<String> {
-            val args = mutableListOf("-Xlint:unchecked")
+            val args = mutableListOf(
+                "-Xlint:unchecked",
+                "-Xlint:-options", // // JDK 21 considers Java 8 an obsolete source and target value. Disable this warning.
+            )
             if (failOnDeprecationWarnings.get()) {
                 args.add("-Xlint:deprecation")
             }
@@ -83,6 +86,9 @@ abstract class JvmLibrary : Plugin<Project> {
 
 @Restricted
 interface AndroidXJvmLibrary : HasLibraryDependencies {
+    /**
+     * Sets java compile version
+     */
     @get:Restricted
     val javaVersion: Property<Int>
 
