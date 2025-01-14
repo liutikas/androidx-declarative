@@ -16,72 +16,111 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.declarative.dsl.model.annotations.Configuring
 import org.gradle.declarative.dsl.model.annotations.Restricted
 import org.gradle.jvm.toolchain.JavaLanguageVersion
+import org.gradle.kotlin.dsl.getByType
 import org.gradle.process.CommandLineArgumentProvider
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 
 abstract class JvmLibrary : Plugin<Project> {
-    @SoftwareType(name = "androidxJvmLibrary", modelPublicType = AndroidXJvmLibrary::class)
-    abstract fun getAndroidXJvmLibrary(): AndroidXJvmLibrary
+    @get:SoftwareType(name = "androidxJvmLibrary", modelPublicType = AndroidXJvmLibrary::class)
+    abstract val androidXJvmLibrary: AndroidXJvmLibrary
 
     override fun apply(target: Project) {
-        setDslConventions()
+        androidXJvmLibrary.setDslConventions()
         target.plugins.apply(JavaLibraryPlugin::class.java)
         val java = target.extensions.getByType(JavaPluginExtension::class.java)
-        linkJavaVersion(target, getAndroidXJvmLibrary())
-        linkSourceSetToDependencies(
+        val mainSourceSet = java.sourceSets.getByName("main")
+        linkJvmLibraryDsl(
             target,
-            java.sourceSets.getByName("main"),
-            getAndroidXJvmLibrary().getDependencies()
-        )
-        linkJavaCompilerArguments(target, getAndroidXJvmLibrary())
-    }
-
-    private fun setDslConventions() {
-        getAndroidXJvmLibrary().apply {
-            javaVersion.convention(17)
-            failOnDeprecationWarnings.convention(true)
-        }
-    }
-
-    internal class JavaCompileArgumentProvider(
-        private val failOnDeprecationWarnings: Provider<Boolean>
-    ): CommandLineArgumentProvider {
-        override fun asArguments(): MutableIterable<String> {
-            val args = mutableListOf(
-                "-Xlint:unchecked",
-                "-Xlint:-options", // // JDK 21 considers Java 8 an obsolete source and target value. Disable this warning.
+            androidXJvmLibrary,
+            ConfigurationNames(
+                mainSourceSet.apiConfigurationName,
+                mainSourceSet.implementationConfigurationName
             )
-            if (failOnDeprecationWarnings.get()) {
-                args.add("-Xlint:deprecation")
-            }
-            return args
+        )
+    }
+}
+
+abstract class JvmKotlinLibraryPlugin : Plugin<Project> {
+    @get:SoftwareType(name = "androidxJvmKotlinLibrary", modelPublicType = AndroidXJvmLibrary::class)
+    abstract val androidxJvmKotlinLibrary: AndroidXJvmLibrary
+
+    override fun apply(target: Project) {
+        androidxJvmKotlinLibrary.setDslConventions()
+        target.plugins.apply("org.jetbrains.kotlin.jvm")
+        val sourceSet = target.extensions.getByType<KotlinJvmExtension>().sourceSets.getByName("main")
+        linkJvmLibraryDsl(
+            target,
+            androidxJvmKotlinLibrary,
+            ConfigurationNames(
+                sourceSet.apiConfigurationName,
+                sourceSet.implementationConfigurationName
+            )
+        )
+    }
+}
+
+private data class ConfigurationNames(
+    val api: String,
+    val implementation: String,
+)
+
+private fun linkJvmLibraryDsl(
+    project: Project,
+    androidXJvmLibrary: AndroidXJvmLibrary,
+    configurations: ConfigurationNames,
+) {
+    linkJavaVersion(project, androidXJvmLibrary)
+    linkJavaCompilerArguments(project, androidXJvmLibrary)
+    linkSourceSetToDependencies(
+        project,
+        configurations,
+        androidXJvmLibrary.getDependencies()
+    )
+}
+
+private fun linkJavaVersion(project: Project, dslModel: AndroidXJvmLibrary) {
+    val java = project.extensions.getByType(JavaPluginExtension::class.java)
+    java.toolchain.languageVersion.set(dslModel.javaVersion.map(JavaLanguageVersion::of))
+}
+
+private fun linkSourceSetToDependencies(
+    project: Project,
+    configurations: ConfigurationNames,
+    dependencies: LibraryDependencies
+) {
+    project.configurations.getByName(configurations.implementation).dependencies.addAllLater(
+        dependencies.implementation.dependencies
+    )
+    project.configurations.getByName(configurations.api).dependencies.addAllLater(
+        dependencies.api.dependencies
+    )
+}
+
+internal class JavaCompileArgumentProvider(
+    private val failOnDeprecationWarnings: Provider<Boolean>
+): CommandLineArgumentProvider {
+    override fun asArguments(): MutableIterable<String> {
+        val args = mutableListOf(
+            "-Xlint:unchecked",
+            "-Xlint:-options", // // JDK 21 considers Java 8 an obsolete source and target value. Disable this warning.
+        )
+        if (failOnDeprecationWarnings.get()) {
+            args.add("-Xlint:deprecation")
         }
-
+        return args
     }
+}
 
-    private fun linkJavaCompilerArguments(project: Project, dslModel: AndroidXJvmLibrary) {
-        val argProvider = JavaCompileArgumentProvider(dslModel.failOnDeprecationWarnings)
-        project.tasks.withType(JavaCompile::class.java).configureEach {
-            options.compilerArgumentProviders.add(argProvider)
-        }
+private fun linkJavaCompilerArguments(project: Project, dslModel: AndroidXJvmLibrary) {
+    val argProvider = JavaCompileArgumentProvider(dslModel.failOnDeprecationWarnings)
+    project.tasks.withType(JavaCompile::class.java).configureEach {
+        options.compilerArgumentProviders.add(argProvider)
     }
+}
 
-    private fun linkJavaVersion(project: Project, dslModel: AndroidXJvmLibrary) {
-        val java = project.extensions.getByType(JavaPluginExtension::class.java)
-        java.toolchain.languageVersion.set(dslModel.javaVersion.map(JavaLanguageVersion::of))
-    }
-
-    private fun linkSourceSetToDependencies(
-        project: Project,
-        sourceSet: SourceSet,
-        dependencies: LibraryDependencies
-    ) {
-        project.configurations.getByName(
-            sourceSet.implementationConfigurationName
-        ).dependencies.addAllLater(dependencies.implementation.dependencies)
-        project.configurations.getByName(
-            sourceSet.apiConfigurationName
-        ).dependencies.addAllLater(dependencies.api.dependencies)
-    }
+private fun AndroidXJvmLibrary.setDslConventions() {
+    javaVersion.convention(17)
+    failOnDeprecationWarnings.convention(true)
 }
 
 @Restricted

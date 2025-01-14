@@ -16,6 +16,7 @@ include("app")
 include("list")
 include("utilities")
 include("lib")
+include("kotlinLib")
 
 defaults {
     javaLibrary {

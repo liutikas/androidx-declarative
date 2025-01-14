@@ -4,15 +4,10 @@ plugins {
 
 dependencies {
     implementation(gradleApi())
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0")
 }
 
 gradlePlugin {
-    plugins {
-        create("jvm-library") {
-            id = "androidx-jvm-library"
-            implementationClass = "androidx.build.JvmLibrary"
-        }
-    }
     plugins {
         create("jvm-ecosystem-plugin") {
             id = "androidx-jvm-ecosystem-plugin"
