@@ -1,0 +1,6 @@
+.idea
+.gradle
+local.properties
+build
+# Don't ignore src files under build package
+!**/src/**/build
