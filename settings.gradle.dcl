@@ -22,7 +22,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "declarative-androidx"
 
-include("app")
 include("list")
 include("utilities")
 include("lib")

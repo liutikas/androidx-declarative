@@ -1,12 +1,15 @@
 package androidx.build
 
+import com.android.build.gradle.internal.crash.afterEvaluate
+import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.internal.plugins.software.SoftwareType
 import org.gradle.api.plugins.JavaLibraryPlugin
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.api.tasks.Nested
+import org.gradle.declarative.dsl.model.annotations.Configuring
 import org.gradle.declarative.dsl.model.annotations.Restricted
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.kotlin.dsl.getByType
@@ -29,6 +32,10 @@ abstract class JvmLibrary : Plugin<Project> {
                 mainSourceSet.implementationConfigurationName
             )
         )
+        val testSourceSet = java.sourceSets.getByName("test")
+        target.configurations.getByName(testSourceSet.implementationConfigurationName).dependencies.addAllLater(
+            androidXJvmLibrary.getTesting().dependencies.implementation.dependencies
+        )
     }
 }
 
@@ -48,6 +55,10 @@ abstract class JvmKotlinLibraryPlugin : Plugin<Project> {
                 sourceSet.apiConfigurationName,
                 sourceSet.implementationConfigurationName
             )
+        )
+        val testSourceSet = kotlinExtension.sourceSets.getByName("test")
+        target.configurations.getByName(testSourceSet.implementationConfigurationName).dependencies.addAllLater(
+            androidxJvmKotlinLibrary.getTesting().dependencies.implementation.dependencies
         )
         kotlinExtension.compilerOptions.languageVersion.set(
             androidxJvmKotlinLibrary.kotlinVersion.map { it.toKotlinVersion() }
@@ -78,7 +89,6 @@ private fun linkJavaVersion(project: Project, dslModel: AndroidXJvmLibrary) {
     val java = project.extensions.getByType(JavaPluginExtension::class.java)
     java.toolchain.languageVersion.set(dslModel.javaVersion.map(JavaLanguageVersion::of))
 }
-
 
 private fun AndroidXJvmLibrary.setDslConventions() {
     javaVersion.convention(17)
@@ -115,4 +125,26 @@ enum class KotlinVersion {
 }
 
 @Restricted
-interface AndroidXJvmLibrary : HasLibraryDependencies, HasJavaSupport
+interface AndroidXJvmLibrary : HasLibraryDependencies, HasJavaSupport {
+    @Nested
+    fun getTesting(): Testing
+
+    @Configuring
+    fun testing(action: Action<Testing>) {
+        action.execute(getTesting())
+    }
+}
+
+@Restricted
+interface Testing {
+    @get:Nested
+    val dependencies: TestDependencies
+
+    @Configuring
+    fun dependencies(action: Action<TestDependencies>) {
+        action.execute(dependencies)
+    }
+}
+
+@Restricted
+interface TestDependencies : BasicDependencies
