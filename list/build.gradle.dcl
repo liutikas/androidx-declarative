@@ -6,4 +6,8 @@ androidxJvmLibrary {
             implementation("org.junit.platform:junit-platform-launcher")
         }
     }
+    publishing {
+        group = "androidx.foo"
+        version = "1.0.0"
+    }
 }

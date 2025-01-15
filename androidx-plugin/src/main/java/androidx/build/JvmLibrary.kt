@@ -8,11 +8,14 @@ import org.gradle.api.internal.plugins.software.SoftwareType
 import org.gradle.api.plugins.JavaLibraryPlugin
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Property
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.Nested
 import org.gradle.declarative.dsl.model.annotations.Configuring
 import org.gradle.declarative.dsl.model.annotations.Restricted
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 
 abstract class JvmLibrary : Plugin<Project> {
@@ -22,6 +25,7 @@ abstract class JvmLibrary : Plugin<Project> {
     override fun apply(target: Project) {
         androidXJvmLibrary.setDslConventions()
         target.plugins.apply(JavaLibraryPlugin::class.java)
+        target.plugins.apply("maven-publish")
         val java = target.extensions.getByType(JavaPluginExtension::class.java)
         val mainSourceSet = java.sourceSets.getByName("main")
         linkJvmLibraryDsl(
@@ -46,6 +50,7 @@ abstract class JvmKotlinLibraryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         androidxJvmKotlinLibrary.setDslConventions()
         target.plugins.apply("org.jetbrains.kotlin.jvm")
+        target.plugins.apply("maven-publish")
         val kotlinExtension = target.extensions.getByType<KotlinJvmExtension>()
         val sourceSet = kotlinExtension.sourceSets.getByName("main")
         linkJvmLibraryDsl(
@@ -70,12 +75,12 @@ abstract class JvmKotlinLibraryPlugin : Plugin<Project> {
     }
 }
 
-
 private fun linkJvmLibraryDsl(
     project: Project,
     androidXJvmLibrary: AndroidXJvmLibrary,
     configurations: ConfigurationNames,
 ) {
+    linkPublishingToMavenPublish(project, androidXJvmLibrary, "java")
     linkJavaVersion(project, androidXJvmLibrary)
     linkJavaCompilerArguments(project, androidXJvmLibrary)
     linkSourceSetToDependencies(
@@ -125,7 +130,7 @@ enum class KotlinVersion {
 }
 
 @Restricted
-interface AndroidXJvmLibrary : HasLibraryDependencies, HasJavaSupport {
+interface AndroidXJvmLibrary : HasLibraryDependencies, HasJavaSupport, HasPublishingSupport {
     @Nested
     fun getTesting(): Testing
 

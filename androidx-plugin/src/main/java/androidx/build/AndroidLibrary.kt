@@ -7,10 +7,14 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.internal.plugins.software.SoftwareType
 import org.gradle.api.provider.Property
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.Nested
 import org.gradle.declarative.dsl.model.annotations.Configuring
 import org.gradle.declarative.dsl.model.annotations.Restricted
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidExtension
 
@@ -20,6 +24,7 @@ abstract class AndroidLibraryPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         androidXAndroidLibrary.setDslContentions()
+        target.plugins.apply("maven-publish")
         target.plugins.apply("com.android.library")
         linkDslToAndroidExtension(target, androidXAndroidLibrary)
     }
@@ -31,6 +36,7 @@ abstract class AndroidKotlinLibraryPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         androidXAndroidLibrary.setDslContentions()
+        target.plugins.apply("maven-publish")
         target.plugins.apply("com.android.library")
         target.plugins.apply("kotlin-android")
         linkDslToAndroidExtension(target, androidXAndroidLibrary)
@@ -44,6 +50,15 @@ abstract class AndroidKotlinLibraryPlugin : Plugin<Project> {
 }
 
 private fun linkDslToAndroidExtension(project: Project, androidXAndroidLibrary: AndroidXAndroidLibrary) {
+    linkPublishingToMavenPublish(project, androidXAndroidLibrary, "release")
+
+    project.configure<LibraryExtension> {
+        publishing {
+            singleVariant("release") {
+                withSourcesJar()
+            }
+        }
+    }
     project.extensions.getByType<LibraryAndroidComponentsExtension>().finalizeDsl { android ->
         android.namespace = androidXAndroidLibrary.namespace.get()
         android.compileSdk = androidXAndroidLibrary.compileSdk.get()
@@ -74,7 +89,7 @@ private fun AndroidXAndroidLibrary.setDslContentions() {
 }
 
 @Restricted
-interface AndroidXAndroidLibrary : HasLibraryDependencies, HasJavaSupport {
+interface AndroidXAndroidLibrary : HasLibraryDependencies, HasJavaSupport, HasPublishingSupport {
     @get:Restricted
     val compileSdk: Property<Int>
 

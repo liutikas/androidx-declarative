@@ -19,4 +19,13 @@ androidxAndroidKotlinLibrary {
             implementation("junit:junit:4.13.2")
         }
     }
+
+    publishing {
+        group = "androidx.foo"
+        version = "1.0.0"
+        name = "Core"
+        inceptionYear = 2015
+        description = """Provides backward-compatible implementations of Android
+                platform APIs and features."""
+    }
 }
