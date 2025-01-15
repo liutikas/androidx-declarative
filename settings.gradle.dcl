@@ -22,12 +22,11 @@ dependencyResolutionManagement {
 rootProject.name = "declarative-androidx"
 
 include(":core:core")
+include(":palette:palette")
 include("list")
 include("utilities")
 include("lib")
 include("kotlinLib")
-include("androidLib")
-include("androidKotlinLib")
 
 defaults {
 }
