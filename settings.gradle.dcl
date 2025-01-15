@@ -13,6 +13,13 @@ plugins {
     id("androidx-android-ecosystem-plugin")
 }
 
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        google()
+    }
+}
+
 rootProject.name = "declarative-androidx"
 
 include("app")
@@ -21,6 +28,7 @@ include("utilities")
 include("lib")
 include("kotlinLib")
 include("androidLib")
+include("androidKotlinLib")
 
 defaults {
     javaLibrary {
