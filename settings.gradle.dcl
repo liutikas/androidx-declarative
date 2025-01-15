@@ -21,6 +21,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "declarative-androidx"
 
+include(":annotation:annotation")
 include(":core:core")
 include(":palette:palette")
 include("list")
