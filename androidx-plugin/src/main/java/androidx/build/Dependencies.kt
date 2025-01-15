@@ -31,6 +31,20 @@ interface BasicDependencies : Dependencies {
     val compileOnly: DependencyCollector
 }
 
+@Restricted
+interface Testing {
+    @get:Nested
+    val dependencies: TestDependencies
+
+    @Configuring
+    fun dependencies(action: Action<TestDependencies>) {
+        action.execute(dependencies)
+    }
+}
+
+@Restricted
+interface TestDependencies : BasicDependencies
+
 internal fun linkSourceSetToDependencies(
     project: Project,
     configurations: ConfigurationNames,
