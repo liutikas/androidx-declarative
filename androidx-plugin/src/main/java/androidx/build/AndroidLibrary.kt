@@ -1,6 +1,7 @@
 package androidx.build
 
 import com.android.build.api.dsl.LibraryExtension
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -19,8 +20,8 @@ abstract class AndroidLibraryPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         androidXAndroidLibrary.setDslContentions()
-        linkDslToAndroidExtension(target, androidXAndroidLibrary)
         target.plugins.apply("com.android.library")
+        linkDslToAndroidExtension(target, androidXAndroidLibrary)
     }
 }
 
@@ -30,9 +31,9 @@ abstract class AndroidKotlinLibraryPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         androidXAndroidLibrary.setDslContentions()
-        linkDslToAndroidExtension(target, androidXAndroidLibrary)
         target.plugins.apply("com.android.library")
         target.plugins.apply("kotlin-android")
+        linkDslToAndroidExtension(target, androidXAndroidLibrary)
         target.extensions.getByType<KotlinAndroidExtension>().compilerOptions.jvmTarget.set(androidXAndroidLibrary.javaVersion.map {
             when {
                 it == 8 -> JvmTarget.JVM_1_8
@@ -43,8 +44,7 @@ abstract class AndroidKotlinLibraryPlugin : Plugin<Project> {
 }
 
 private fun linkDslToAndroidExtension(project: Project, androidXAndroidLibrary: AndroidXAndroidLibrary) {
-    project.afterEvaluate {
-        val android = project.extensions.getByType<LibraryExtension>()
+    project.extensions.getByType<LibraryAndroidComponentsExtension>().finalizeDsl { android ->
         android.namespace = androidXAndroidLibrary.namespace.get()
         android.compileSdk = androidXAndroidLibrary.compileSdk.get()
         android.defaultConfig {
