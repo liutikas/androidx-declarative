@@ -45,6 +45,7 @@ abstract class JvmKotlinLibraryPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         androidxJvmKotlinLibrary.setDslConventions()
+        androidxJvmKotlinLibrary.kotlinVersion.convention(KotlinVersion.KOTLIN_1_8)
         target.plugins.apply("org.jetbrains.kotlin.jvm")
         target.plugins.apply("maven-publish")
         val kotlinExtension = target.extensions.getByType<KotlinJvmExtension>()
