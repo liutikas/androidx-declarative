@@ -15,7 +15,7 @@ import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 
 abstract class JvmLibrary : Plugin<Project> {
-    @get:SoftwareType(name = "androidxJvmLibrary")
+    @get:SoftwareType(name = "jarLibrary")
     abstract val androidXJvmLibrary: AndroidXJvmLibrary
 
     override fun apply(target: Project) {
@@ -40,7 +40,7 @@ abstract class JvmLibrary : Plugin<Project> {
 }
 
 abstract class JvmKotlinLibraryPlugin : Plugin<Project> {
-    @get:SoftwareType(name = "androidxJvmKotlinLibrary")
+    @get:SoftwareType(name = "jarLibraryWithKotlin")
     abstract val androidxJvmKotlinLibrary: AndroidXJvmKotlinLibrary
 
     override fun apply(target: Project) {

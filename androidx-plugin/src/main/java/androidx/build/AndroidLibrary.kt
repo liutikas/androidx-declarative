@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidExtension
 
 abstract class AndroidLibraryPlugin : Plugin<Project> {
-    @get:SoftwareType(name = "androidxAndroidLibrary")
+    @get:SoftwareType(name = "androidLibrary")
     abstract val androidXAndroidLibrary: AndroidXAndroidLibrary
 
     override fun apply(target: Project) {
@@ -28,7 +28,7 @@ abstract class AndroidLibraryPlugin : Plugin<Project> {
 }
 
 abstract class AndroidKotlinLibraryPlugin : Plugin<Project> {
-    @get:SoftwareType(name = "androidxAndroidKotlinLibrary")
+    @get:SoftwareType(name = "androidLibraryWithKotlin")
     abstract val androidXAndroidLibrary: AndroidXAndroidLibrary
 
     override fun apply(target: Project) {

@@ -1,4 +1,4 @@
-androidxAndroidKotlinLibrary {
+androidLibraryWithKotlin {
     namespace = "androidx.core"
 
     dependencies {
