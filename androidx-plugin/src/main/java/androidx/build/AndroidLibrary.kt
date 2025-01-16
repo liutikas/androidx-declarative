@@ -29,15 +29,17 @@ abstract class AndroidLibraryPlugin : Plugin<Project> {
 
 abstract class AndroidKotlinLibraryPlugin : Plugin<Project> {
     @get:SoftwareType(name = "androidLibraryWithKotlin")
-    abstract val androidXAndroidLibrary: AndroidXAndroidLibrary
+    abstract val androidXAndroidKotlinLibrary: AndroidXAndroidKotlinLibrary
 
     override fun apply(target: Project) {
-        androidXAndroidLibrary.setDslContentions()
+        androidXAndroidKotlinLibrary.setDslContentions()
+        androidXAndroidKotlinLibrary.kotlinVersion.convention(KotlinVersion.KOTLIN_1_8)
         target.plugins.apply("maven-publish")
         target.plugins.apply("com.android.library")
         target.plugins.apply("kotlin-android")
-        linkDslToAndroidExtension(target, androidXAndroidLibrary)
-        target.extensions.getByType<KotlinAndroidExtension>().compilerOptions.jvmTarget.set(androidXAndroidLibrary.javaVersion.map {
+        linkDslToAndroidExtension(target, androidXAndroidKotlinLibrary)
+        setTargetKotlinVersion(target, androidXAndroidKotlinLibrary)
+        target.extensions.getByType<KotlinAndroidExtension>().compilerOptions.jvmTarget.set(androidXAndroidKotlinLibrary.javaVersion.map {
             when {
                 it == 8 -> JvmTarget.JVM_1_8
                 else -> JvmTarget.JVM_21
@@ -109,3 +111,6 @@ interface AndroidXAndroidLibrary : HasLibraryDependencies, HasJavaSupport, HasPu
         action.execute(getDevicelessTest())
     }
 }
+
+@Restricted
+interface AndroidXAndroidKotlinLibrary : AndroidXAndroidLibrary, HasKotlinSupport
