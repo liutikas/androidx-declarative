@@ -15,6 +15,7 @@ androidLibraryWithKotlin {
     }
 
     devicelessTest {
+        robolectricEnabled = true
         dependencies {
             implementation("junit:junit:4.13.2")
         }

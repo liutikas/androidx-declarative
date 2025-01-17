@@ -104,12 +104,18 @@ interface AndroidXAndroidLibrary : HasLibraryDependencies, HasJavaSupport, HasPu
     }
 
     @Nested
-    fun getDevicelessTest(): Testing
+    fun getDevicelessTest(): DevicelessTesting
 
     @Configuring
-    fun devicelessTest(action: Action<Testing>) {
+    fun devicelessTest(action: Action<DevicelessTesting>) {
         action.execute(getDevicelessTest())
     }
+}
+
+@Restricted
+interface DevicelessTesting: Testing {
+    @get:Restricted
+    val robolectricEnabled: Property<Boolean>
 }
 
 @Restricted
