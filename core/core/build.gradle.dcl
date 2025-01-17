@@ -22,7 +22,7 @@ androidLibraryWithKotlin {
     }
 
     publishing {
-        group = "androidx.foo"
+        group = ANDROIDX_CORE
         version = "1.0.0"
         name = "Core"
         inceptionYear = 2015

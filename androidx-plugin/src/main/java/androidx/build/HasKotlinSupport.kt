@@ -25,6 +25,9 @@ internal fun setTargetKotlinVersion(project: Project, hasKotlinSupport: HasKotli
 
 @Restricted
 interface HasKotlinSupport {
+    /**
+     * Kotlin language version to use for this project.
+     */
     @get:Restricted
     val kotlinVersion: Property<KotlinVersion>
 }

@@ -5,7 +5,7 @@ plugins {
 dependencies {
     implementation(gradleApi())
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0")
-    implementation("com.android.tools.build:gradle:8.9.0-alpha09")
+    implementation("com.android.tools.build:gradle:8.10.0-alpha02")
 }
 
 java {

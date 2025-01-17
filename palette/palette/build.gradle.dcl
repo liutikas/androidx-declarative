@@ -8,6 +8,6 @@ androidLibrary {
 
     publishing {
         version = "1.2.0"
-        group = "androidx.palette"
+        group = ANDROIDX_PALETTE
     }
 }

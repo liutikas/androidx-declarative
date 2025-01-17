@@ -27,7 +27,7 @@ internal fun linkPublishingToMavenPublish(
             publications {
                 register<MavenPublication>("release") {
                     from(components.getByName(componentName))
-                    groupId = hasPublishing.publishing.group.get()
+                    groupId = hasPublishing.publishing.group.get().groupName
                     version = hasPublishing.publishing.version.get()
                 }
             }
@@ -56,5 +56,5 @@ interface Publishing {
     @get:Restricted
     val version: Property<String>
     @get:Restricted
-    val group: Property<String>
+    val group: Property<AndroidXMavenGroup>
 }
